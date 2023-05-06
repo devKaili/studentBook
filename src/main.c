@@ -4,45 +4,31 @@
 #include <string.h>
 #include <unistd.h>
 
-void intro(), personalization(), personalization_check(), menu(), greet_the_user();
+char name[100];
+
+void intro(), personalization(), menu(), greet_the_user();
 
 int main() {
     intro();
-    personalization_check();
+    personalization();
 }
 
 void intro() { // introduction to the program, wait for Enter at the end
     system("CLS");
     printf("\033[1;36m--- ZAKOVSKA KNIHA ---\033[0;37m\n"); //cyan colored heading
     printf("\nTento program slouzi jako elektronicka Zakovska kniha,\numoznuje zapsani znamky, zobrazeni prehledu znamek, prumeru \na vypis predmetu ze kterych zak propada.\n");
+    printf("Nevyhodou tohoto programu je ztrata dat po ukonceni\n");
     printf("Stiskni Enter pro pokracovani...");
     getchar();
 }
 
-void personalization() { // personalize the app by specifying your name and gender
-    char name[100];
-
-    FILE *config_file = fopen("config.txt", "w");
-    if (config_file == NULL) {
-        printf("ERROR opening config file!");
-        exit(1);
-    }
-    system("CLS");
-    printf("\033[1;36m--- ZAKOVSKA KNIHA ---\033[0;37m\n"); //cyan colored heading
-    printf("\nZadej sve jmeno a stiskni Enter: ");
+void personalization() { // personalize the app by specifying your name
+    printf("Zadej sve jmeno: ");
     scanf("%s", name);
-
-    fprintf(config_file, "%s", name);
-
-    fclose(config_file);
+    printf("Zadane jmeno: %s\n", name);
+    sleep(0.5);
+    printf("Data ulozena.\n");
     menu();
-}
-void personalization_check() { // check if personalization has been made before
-    if (access("config.txt", F_OK) != -1) {
-        menu();
-    } else {
-        personalization();
-    }
 }
 
 void menu() { // main menu
@@ -50,25 +36,16 @@ void menu() { // main menu
     system("CLS");
     printf("\033[1;36m--- ZAKOVSKA KNIHA ---\033[0;37m\n\n"); //cyan colored heading
     greet_the_user();
-    printf("\n\n\033[1;36m--- HLAVNI MENU ---\033[1;37m\n");
+    printf("\n\n\033[1;36m--- HLAVNI MENU ---\033[0;37m\n");
     printf("\n1) Zadat novou znamku\n2) Zobrazit prehled znamek\n3) Zobrazit prumery predmetu\n4) Zobrazit predmety, ze kterych zak propada\n4) Ukoncit program\n");
     printf("\nZadej odpovidajici cislo a stiskni Enter: ");
     scanf("%d", &menu_select);
+
+    
 }
 
 void greet_the_user() {
     char greet[50];
-    char *name;
-
-    FILE *config_file = fopen("config.txt", "r");
-    if (config_file == NULL) {
-        printf("ERROR opening config file!");
-        exit(1);
-    }
-
-    fscanf(config_file, "%s", name);
-        
-    fclose(config_file);
 
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);

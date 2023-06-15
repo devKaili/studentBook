@@ -24,16 +24,22 @@
 #define CLEAR printf("\e[1;1H\e[2J");
 
 // Function declaration.
-void programIntroduction(), personalization(), personalizationConfirm(int personalizationMenuSelect), invalidInput(), mainMenu(), programExit();
+void programIntroduction(), personalization(), personalizationConfirm(int personalizationMenuSelect), invalidInput(), mainMenu(), markInput(), nextMark(int markInputMenuSelect, int mark), markOverview(), passedWithDistinction(), failingClasses(), programExit();
 
 char greetUserAccordingToTime();
 
 int inputCheck(int userInput, int maxValue);
 
+float averageCalculation(int markTotal, int counter);
+
 // Global variable declaration for the personalization() function.
 char name[100];
 int gender;
 
+// Global variable declaration for mark averages, i dont think this is the best way, but if it works, it works...
+int markMathCount, markPhysicsCount, markChemistryCount, markEnglishCount, markComputerScienceCount;
+int markMathTotal, markPhysicsTotal, markChemistryTotal, markEnglishTotal, markComputerScienceTotal;
+float markMath, markPhysics, markChemistry, markEnglish, markComputerScience;
 
 // ------------------------------- MAIN FUNC STARTS HERE ---------------------------
 int main()
@@ -141,10 +147,12 @@ char greetUserAccordingToTime()
 void mainMenu()
 { 
     int mainMenuSelect;
+
     CLEAR
+    
     printf(CYAN"----- HLAVNI MENU -----\n\n"WHITE);
     greetUserAccordingToTime();
-    printf("\nPrejes si...\n1 - Zadat novou znamku\n2 - Zobrazit tabulku prumeru\n3 - Zobrazit celkovy prumer a zda-li zak ukonci skolni rok s vyznamenanim\n4 - Zobrazit predmety ze kterych zak propada\n5 - Ukoncit program\n");
+    printf("\nPrejes si...\n1 - Zadat novou znamku\n2 - Zobrazit tabulku prumeru\n3 - Zobrazit celkovy prumer a zda-li zak ukonci skolni rok s vyznamenanim\n4 - Zobrazit predmety ze kterych zak propada\n"RED"5 - Ukoncit program\n"WHITE);
     printf("Zvol operaci zadanim odpovidajiciho cisla: ");
     scanf("%d", &mainMenuSelect);
     printf("Zadana hodnota: "YELLOW"%d"WHITE, mainMenuSelect);
@@ -159,16 +167,16 @@ void mainMenu()
     switch (mainMenuSelect)
     {
     case 1:
-        // markInput();
+        markInput();
         break;
     case 2:
-        // TBD
+        markOverview();
         break;
     case 3:
-        // TBD
+        passedWithDistinction();
         break;
     case 4:
-        // TBD
+        failingClasses();
         break;
     case 5:
         programExit();
@@ -177,11 +185,288 @@ void mainMenu()
 
 }
 
+// Allows the user to input marks for further functionality of the app
+void markInput()
+{
+    int markInputMenuSelect;
+    int mark = 0;
+
+    CLEAR
+    
+    printf(CYAN"----- ZADANI ZNAMKY -----\n\n"WHITE);
+    printf("Zvol predmet do ktereho chces zadavat znamku:\n1 - Matematika\n2 - Fyzika\n3 - Chemie\n4 - Anglictina\n5 - Informatika\n"RED"6 - Navrat do hlavniho menu\n"WHITE);
+    printf("Zvol operaci zadanim odpovidajiciho cisla: ");
+    scanf("%d", &markInputMenuSelect);
+    printf("Zadana hodnota: "YELLOW"%d"WHITE, markInputMenuSelect);
+    sleep(1);
+
+    if (inputCheck(markInputMenuSelect, 6))
+    {
+        invalidInput();
+        markInput();
+    }
+    if (markInputMenuSelect == 6)
+    {
+        CLEAR
+        printf(GREEN"NAVRAT DO HLAVNIHO MENU\n"WHITE);
+        sleep(2);
+        mainMenu();
+    }
+
+    CLEAR
+    printf("Zadej znamku (pouze cela cisla od 1 do 5): ");
+    scanf("%d", &mark);
+    printf("Zadana hodnota: "YELLOW"%d"WHITE, mark);
+    sleep(1);
+
+    if (inputCheck(mark, 5))
+    {
+        CLEAR
+        printf(RED"Zadana znamka je neodpovida rozmezi 1-5!"WHITE);
+        sleep(2);
+        markInput();
+    }
+
+    CLEAR
+
+    switch (markInputMenuSelect)
+    {
+    case 1:
+        printf(YELLOW"Znamka zadana do predmetu 'Matematika'."WHITE);
+        break;
+    case 2:
+        printf(YELLOW"Znamka zadana do predmetu 'Fyzika'."WHITE);
+        break;
+    case 3:
+        printf(YELLOW"Znamka zadana do predmetu 'Chemie'."WHITE);
+        break;
+    case 4:
+        printf(YELLOW"Znamka zadana do predmetu 'Anglictina'."WHITE);
+        break;
+    case 5:
+        printf(YELLOW"Znamka zadana do predmetu 'Informatika'."WHITE);
+        break;
+    }
+
+    nextMark(markInputMenuSelect, mark);
+}
+void nextMark(int markInputMenuSelect, int mark)
+{
+    int nextMarkMenuSelect;
+    printf("\nPrejes si:\n1 - Ulozit a zadat dalsi znamku\n2 - Zrusit a opakovat zadani\n3 - Ulozit vratit se do hlavniho menu\n");
+    printf("Zvol operaci zadanim odpovidajiciho cisla: ");
+    scanf("%d", &nextMarkMenuSelect);
+    printf("Zadana hodnota: "YELLOW"%d"WHITE, nextMarkMenuSelect);
+    sleep(1);
+
+    if (inputCheck(nextMarkMenuSelect, 3))
+    {
+        invalidInput();
+        nextMark(markInputMenuSelect, mark);
+    }
+    if (nextMarkMenuSelect == 2)
+    {
+        CLEAR
+        printf(YELLOW"Zadani znamky vymazano!"WHITE);
+        sleep(2);
+        markInput();
+    }
+
+    // Save the inputed mark to a corresponding variable
+    switch (markInputMenuSelect)
+    {
+    case 1:
+        markMathCount ++;
+        markMathTotal += mark;
+        markMath = averageCalculation(markMathTotal, markMathCount);
+        break;
+    case 2:
+        markPhysicsCount ++;
+        markPhysicsTotal += mark;
+        markPhysics = averageCalculation(markPhysicsTotal, markPhysicsCount);
+        break;
+    case 3:
+        markChemistryCount ++;
+        markChemistryTotal += mark;
+        markChemistry = averageCalculation(markChemistryTotal, markChemistryCount);
+        break;
+    case 4:
+        markEnglishCount ++;
+        markEnglishTotal += mark;
+        markEnglish = averageCalculation(markEnglishTotal, markEnglishCount);
+        break;
+    case 5:
+        markComputerScienceCount ++;
+        markComputerScienceTotal += mark;
+        markComputerScience = averageCalculation(markComputerScienceTotal, markComputerScienceCount);
+        break;
+    }
+
+    CLEAR
+    printf(YELLOW"Znamka ulozena!"WHITE);
+    sleep(2);
+
+    switch (nextMarkMenuSelect)
+    {
+    case 1:
+        markInput();
+        break;
+    case 3:
+        CLEAR
+        printf(GREEN"NAVRAT DO HLAVNIHO MENU\n"WHITE);
+        sleep(2);
+        mainMenu();
+        break;
+    }
+}
+float averageCalculation(int markTotal, int counter)
+{
+    return markTotal / counter;
+}
+
+// Allows the user to view student's total mark average and if they passed with distinction
+void markOverview()
+{
+    int markOverviewMenuSelect;
+
+    CLEAR
+
+    printf(CYAN"----- PREHLED PRUMERU -----\n\n"WHITE);
+    printf("Matemetika: "YELLOW"%f"WHITE"\nFyzika: "YELLOW"%f"WHITE"\nChemie: "YELLOW"%f"WHITE"\nAnglictina: "YELLOW"%f"WHITE"\nInformatika: "YELLOW"%f"WHITE"\n\n", markMath, markPhysics, markChemistry, markEnglish, markComputerScience);
+    printf("1 - Navrat do hlavniho menu\n");
+    printf("Zvol operaci zadanim odpovidajiciho cisla: ");
+    scanf("%d", &markOverviewMenuSelect);
+    
+    if (inputCheck(markOverviewMenuSelect, 1))
+    {
+        invalidInput();
+        markOverview();
+    } 
+    if (markOverviewMenuSelect == 1)
+    {
+        CLEAR
+        printf(GREEN"NAVRAT DO HLAVNIHO MENU\n"WHITE);
+        sleep(2);
+        mainMenu();
+    }
+}
+
+void passedWithDistinction()
+{
+    char distinctionYesNo[4];
+    int passedWithDistinctionMenuSelect;
+    
+    float overallAverage = (markMath + markPhysics + markChemistry + markEnglish + markComputerScience) / (markMathCount + markPhysicsCount + markChemistryCount + markEnglishCount + markComputerScienceCount);
+    
+    CLEAR
+
+    printf(CYAN"----- CELKOVY PRUMER A VYZNAMENANI -----\n\n"WHITE);
+    printf("Celkovy prumer: %f\n", overallAverage);
+    
+    strcpy(distinctionYesNo, "ANO");
+    if (markMath > 2)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+    if (markPhysics > 2)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+    if (markChemistry > 2)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+    if (markEnglish > 2)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+    if (markComputerScience > 2)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+
+    if (overallAverage > 1.5)
+    {
+        strcpy(distinctionYesNo, "NE");
+    }
+
+    printf("Prospeje %s s vyznamenanim: "YELLOW"%s\n\n"WHITE, name, distinctionYesNo);
+
+    printf("1 - Navrat do hlavniho menu\n");
+    printf("Zvol operaci zadanim odpovidajiciho cisla: ");
+    scanf("%d", &passedWithDistinctionMenuSelect);
+    
+    if (inputCheck(passedWithDistinctionMenuSelect, 1))
+    {
+        invalidInput();
+        markOverview();
+    } 
+    if (passedWithDistinctionMenuSelect == 1)
+    {
+        CLEAR
+        printf(GREEN"NAVRAT DO HLAVNIHO MENU\n"WHITE);
+        sleep(2);
+        mainMenu();
+    }
+}
+
+void failingClasses()
+{
+    int failingClassesMenuSelect;
+
+    CLEAR
+
+    printf(CYAN"----- PREDMETY ZE KTERYCH ZAK PROPADA -----\n\n"WHITE);
+    printf("%s propada z:\n", name);
+
+    if (markMath > 4.5)
+    {
+        printf(YELLOW"Matematiky\n");
+    }
+    if (markPhysics > 4.5)
+    {
+        printf(YELLOW"Fyziky\n");
+    }
+    if (markChemistry > 4.5)
+    {
+        printf(YELLOW"Chemie\n");
+    }
+    if (markEnglish > 4.5)
+    {
+        printf(YELLOW"Anglictiny\n");
+    }
+    if (markComputerScience > 4.5)
+    {
+        printf(YELLOW"Informatiky\n");
+    }
+    else if (markMath < 4.5 && markPhysics < 4.5 && markChemistry < 4.5 && markEnglish < 4.5 && markComputerScience < 4.5)
+    {
+        printf(YELLOW"Neni zde nic k zobrazeni..."WHITE);
+    }
+
+    printf(WHITE"1 - Navrat do hlavniho menu\n");
+    printf("Zvol operaci zadanim odpovidajiciho cisla: ");
+    scanf("%d", &failingClassesMenuSelect);
+    
+    if (inputCheck(failingClassesMenuSelect, 1))
+    {
+        invalidInput();
+        markOverview();
+    } 
+    if (failingClassesMenuSelect == 1)
+    {
+        CLEAR
+        printf(GREEN"NAVRAT DO HLAVNIHO MENU\n"WHITE);
+        sleep(2);
+        mainMenu();
+    }
+}
+
 void programExit()
 {
     int progExitMenuSelect;
     CLEAR
-    printf(RED"OPRAVDU SI PREJETE PROGRAM UKONCIT?"WHITE"\n\n1 - Ano, ukoncit (ztrata dat)\n2 - Ne, navrat do hlavniho menu\nZvol operaci zadanim odpovidajiciho cisla: ");
+    printf(RED"OPRAVDU SI PREJETE PROGRAM UKONCIT?"WHITE"\n\n"RED"1 - Ano, ukoncit (ztrata dat)\n"GREEN"2 - Ne, navrat do hlavniho menu"WHITE"\nZvol operaci zadanim odpovidajiciho cisla: ");
     scanf("%d", &progExitMenuSelect);
     printf("Zadana hodnota: "YELLOW"%d"WHITE, progExitMenuSelect);
     sleep(1);
